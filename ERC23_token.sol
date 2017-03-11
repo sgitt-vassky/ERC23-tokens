@@ -8,7 +8,7 @@ contract ERC23 {
   function balanceOf(address who) constant returns (uint);
   function allowance(address owner, address spender) constant returns (uint);
 
-  function transfer(address to, uint value, bytes data) returns (bool ok);
+  function transfer(address to, uint value) returns (bool ok);
   function transferFrom(address from, address to, uint value) returns (bool ok);
   function approve(address spender, uint value) returns (bool ok);
   event Transfer(address indexed from, address indexed to, uint value);
@@ -27,26 +27,23 @@ contract ERC23Token is ERC23 {
   mapping(address => uint) balances;
   mapping (address => mapping (address => uint)) allowed;
   
-  function ERC23Token() {
-      balances[msg.sender]=1000023;
-  }
-
+  
 // A function that is called when a user or another contract wants to transfer funds
   function transfer(address _to, uint _value, bytes _data) returns (bool success) {
      //filtering if the target is a contract with bytecode inside it
     if(isContract(_to))
     {
-        transferToContract(_to, _value, _data);
+        transferToContract(_to, _value);
     }
     else
     {
-        transferToAddress(_to, _value, _data);
+        transferToAddress(_to, _value);
     }
     return true;
   }
 
 //function that is called when transaction target is an address
-  function transferToAddress(address _to, uint _value, bytes _data) private returns (bool success) {
+  function transferToAddress(address _to, uint _value) private returns (bool success) {
     balances[msg.sender] -= _value;
     balances[_to] += _value;
     Transfer(msg.sender, _to, _value);
@@ -54,7 +51,7 @@ contract ERC23Token is ERC23 {
   }
   
 //function that is called when transaction target is a contract
-  function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
+  function transferToContract(address _to, uint _value) private returns (bool success) {
     balances[msg.sender] -= _value;
     balances[_to] += _value;
     contractReciever reciever = contractReciever(_to);
@@ -91,7 +88,6 @@ contract ERC23Token is ERC23 {
     balances[_to] += _value;
     balances[_from] -= _value;
     allowed[_from][msg.sender] -= _value;
-    bytes emptyData;
     Transfer(_from, _to, _value);
     return true;
   }
