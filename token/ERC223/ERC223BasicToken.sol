@@ -34,7 +34,8 @@ contract ERC223BasicToken is ERC223Basic{
             ERC223ReceivingContract receiver = ERC223ReceivingContract(to);
             receiver.tokenFallback(msg.sender, value, data);
         }
-        Transfer(msg.sender, to, value, data);
+        Transfer(msg.sender, to, value);  // ERC20 transfer event
+        Transfer(msg.sender, to, value, data);  // ERC223 transfer event
     }
 
     // Standard function transfer similar to ERC20 transfer with no _data .
@@ -54,7 +55,8 @@ contract ERC223BasicToken is ERC223Basic{
             bytes memory empty;
             receiver.tokenFallback(msg.sender, value, empty);
         }
-        Transfer(msg.sender, to, value, data);
+        Transfer(msg.sender, to, value);  // ERC20 transfer event
+        Transfer(msg.sender, to, value, data);  // ERC223 transfer event
     }
 
     function balanceOf(address _owner) constant returns (uint balance) {
