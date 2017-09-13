@@ -1,3 +1,9 @@
+pragma solidity ^0.4.11;
+
+import './ERC223Basic.sol';
+import './ERC223ReceivingContract.sol';
+import '../../SafeMath.sol';
+
 contract ERC223BasicToken is ERC223Basic{
     using SafeMath for uint;
 
@@ -27,6 +33,7 @@ contract ERC223BasicToken is ERC223Basic{
     // Added due to backwards compatibility reasons .
     function transfer(address to, uint value) {
         uint codeLength;
+        bytes memory empty;
 
         assembly {
             // Retrieve the size of the code on target address, this needs assembly .
@@ -37,7 +44,6 @@ contract ERC223BasicToken is ERC223Basic{
         balances[to] = balances[to].add(value);
         if(codeLength>0) {
             ERC223ReceivingContract receiver = ERC223ReceivingContract(to);
-            bytes memory empty;
             receiver.tokenFallback(msg.sender, value, empty);
         }
         Transfer(msg.sender, to, value, empty);
